@@ -1,0 +1,80 @@
+# 个人配置文件
+.bash_history
+.bash_logout
+.bashrc.bak
+.profile.bak
+.gitconfig
+.mysql_history
+.sudo_as_admin_successful
+.wget-hsts
+.npmrc
+.pydistutils.cfg
+
+# 缓存和配置目录
+.cache/
+.cursor/
+.cursor-server/
+.trae/
+.trae-server/
+.dotnet/
+.local/
+.npm/
+.pip/
+.pki/
+.pm2/
+.ssh/
+.vscode-server/
+.ai_completion/
+.copilot/
+
+# 日志文件
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+venv/
+env/
+
+# 环境变量
+.env
+.env.local
+
+# Python SDK 中的无关文件
+python-sdk/**/share/terminfo/
+python-sdk/**/__pycache__/
+python-sdk/**/*.pyc
+
+# 其他系统文件
+.lesshst
+*.log
+
+# Python 安装目录中的库文件
+python-sdk/**/lib/tk*/
+python-sdk/**/lib/tcl*/
+python-sdk/**/share/man/
+python-sdk/**/include/
+python-sdk/**/bin/
+
+# 其他
+*.pyc
+__pycache__/
+
+# 完全排除 python-sdk 中的库文件和共享文件
+python-sdk/**/lib/
+python-sdk/**/share/
+python-sdk/**/include/
+python-sdk/**/bin/
+python-sdk/**/man/
+
+# 只保留 python-sdk 的核心结构（如果需要的话）
+# 或者完全忽略 python-sdk 目录
+# python-sdk/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

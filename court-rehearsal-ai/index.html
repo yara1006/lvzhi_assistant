@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Court Rehearsal AI · 模拟法庭</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:       #060912;
+      --sf1:      #0b0f1e;
+      --sf2:      #101525;
+      --sf3:      #16203a;
+      --bd:       rgba(255,255,255,0.07);
+      --bd-hi:    rgba(255,255,255,0.14);
+      --gold:     #C9A96E;
+      --gold-lt:  #E2C88A;
+      --gold-dim: rgba(201,169,110,0.1);
+      --gold-bd:  rgba(201,169,110,0.22);
+      --t1:       #EEF2F7;
+      --t2:       #8BA2BE;
+      --t3:       #48637A;
+      --red:      #C96B6B;
+      --green:    #56B578;
+      --blue:     #5599D0;
+      --purple:   #8E72CC;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+
+    body {
+      font-family: 'Noto Sans SC', 'PingFang SC', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--t1);
+      overflow-x: hidden;
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 3px; height: 3px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(201,169,110,0.18); border-radius: 2px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(201,169,110,0.35); }
+
+    /* ── Range slider ── */
+    input[type=range] {
+      -webkit-appearance: none;
+      height: 3px;
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 15px; height: 15px;
+      border-radius: 50%;
+      background: var(--gold);
+      cursor: pointer;
+      box-shadow: 0 0 0 3px rgba(201,169,110,0.2), 0 2px 8px rgba(0,0,0,0.4);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    input[type=range]:hover::-webkit-slider-thumb {
+      transform: scale(1.15);
+      box-shadow: 0 0 0 5px rgba(201,169,110,0.25), 0 2px 12px rgba(0,0,0,0.4);
+    }
+
+    /* ── Hover utilities (applied via className) ── */
+    .card-hover {
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card-hover:hover {
+      background: rgba(255,255,255,0.06) !important;
+      border-color: rgba(255,255,255,0.14) !important;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    .card-active {
+      transform: translateY(-2px) !important;
+      box-shadow: 0 12px 40px rgba(201,169,110,0.15) !important;
+    }
+    .btn-hover { transition: all 0.2s ease; }
+    .btn-hover:hover { filter: brightness(1.12); transform: translateY(-1px); }
+    .btn-hover:active { transform: translateY(0); filter: brightness(0.95); }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.92); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    @keyframes shimmer {
+      0%   { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    @keyframes avatarSpeak {
+      0%, 100% { transform: scale(1); }
+      50%       { transform: scale(1.04); }
+    }
+    @keyframes ringPulse {
+      0%   { transform: scale(1);   opacity: 0.7; }
+      100% { transform: scale(1.8); opacity: 0; }
+    }
+    @keyframes wave1 { 0%,100%{transform:scaleY(0.4)} 50%{transform:scaleY(1)} }
+    @keyframes wave2 { 0%,100%{transform:scaleY(0.6)} 50%{transform:scaleY(0.3)} }
+    @keyframes wave3 { 0%,100%{transform:scaleY(0.8)} 50%{transform:scaleY(0.5)} }
+    @keyframes bop {
+      0%,80%,100% { transform: translateY(0); }
+      40%          { transform: translateY(-5px); }
+    }
+    @keyframes micPulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(201,107,107,0.3); }
+      50%      { box-shadow: 0 0 0 10px rgba(201,107,107,0); }
+    }
+    @keyframes gavelRock {
+      0%,100% { transform: rotate(-6deg) translateY(0); }
+      50%      { transform: rotate(6deg) translateY(-4px); }
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0px); }
+      50%      { transform: translateY(-6px); }
+    }
+    @keyframes slideLeft {
+      from { transform: translateX(-24px); opacity: 0; }
+      to   { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideRight {
+      from { transform: translateX(24px); opacity: 0; }
+      to   { transform: translateX(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+</html>

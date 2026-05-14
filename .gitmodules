@@ -1,0 +1,3 @@
+[submodule "Legal_Assistant"]
+	path = Legal_Assistant
+	url = https://github.com/Zhou-0309/Legal_Assistant_Backend.git

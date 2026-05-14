@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>律智助手 · 法内狂徒</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-badge">⚖</div>
+      <div>
+        <div class="logo-name">律智助手</div>
+        <div class="logo-tagline">法内狂徒 · AI法律平台</div>
+      </div>
+    </div>
+
+    <button class="new-chat-btn" onclick="newChat()">
+      <span class="plus">+</span> 新建对话
+    </button>
+
+    <div class="sidebar-section-label">专业工具</div>
+    <div class="tool-list">
+      <button class="tool-btn tool-law" onclick="openTool('law')">
+        <div class="tool-icon">📜</div>
+        <div><div>法条检索</div><div class="tool-desc">精准查找相关法律条文</div></div>
+      </button>
+      <button class="tool-btn tool-chat" onclick="openTool('chat')">
+        <div class="tool-icon">💬</div>
+        <div><div>法律对话</div><div class="tool-desc">智能法律咨询问答</div></div>
+      </button>
+      <button class="tool-btn tool-contract" onclick="openTool('contract')">
+        <div class="tool-icon">📝</div>
+        <div><div>合同生成</div><div class="tool-desc">AI起草专业合同文本</div></div>
+      </button>
+      <button class="tool-btn tool-review" onclick="openTool('review')">
+        <div class="tool-icon">🛡</div>
+        <div><div>合同审查</div><div class="tool-desc">识别条款风险与隐患</div></div>
+      </button>
+      <button class="tool-btn tool-court" onclick="openTool('court')">
+        <div class="tool-icon">⚖️</div>
+        <div><div>模拟法庭</div><div class="tool-desc">模拟庭审辩论</div></div>
+      </button>
+    </div>
+
+    <div class="history-section">
+      <div class="history-label">历史对话</div>
+      <div class="history-scroll" id="history-scroll">
+        <div class="history-empty">暂无历史对话<br>开始第一次咨询吧</div>
+      </div>
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="user-profile">
+        <div class="user-avatar">⚖️</div>
+        <div class="user-details">
+          <div class="user-name" id="userName">法律助手</div>
+          <div class="user-role">个人用户</div>
+        </div>
+        <button class="logout-btn" id="logoutBtn" title="退出登录">退出</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ══ CHAT ══ -->
+  <div class="chat-col" id="chatView">
+    <div class="chat-header">
+      <div class="chat-title" id="chat-title">新建对话</div>
+      <div class="chat-subtitle">自由提问，或使用左侧专业工具</div>
+    </div>
+
+    <div class="messages" id="messages">
+      <div class="welcome" id="welcome">
+        <div class="welcome-icon">⚖️</div>
+        <div>
+          <div class="welcome-title">您好，我是您的法律AI助手</div>
+          <div class="welcome-sub">直接输入任何法律问题，或使用左侧专业工具进行精准的法条检索、合同审查、合同生成和模拟法庭。</div>
+        </div>
+        <div class="suggestion-grid">
+          <div class="suggestion-card" onclick="quickAsk('劳动合同试用期最长多久？工资不得低于多少？')">
+            <div class="sc-icon">⏱</div><div class="sc-title">试用期规定</div><div class="sc-desc">时长与工资标准</div>
+          </div>
+          <div class="suggestion-card" onclick="quickAsk('合同无效的情形有哪些？法律后果是什么？')">
+            <div class="sc-icon">❌</div><div class="sc-title">合同无效情形</div><div class="sc-desc">认定条件与法律后果</div>
+          </div>
+          <div class="suggestion-card" onclick="quickAsk('员工离职泄露商业秘密，公司如何维权并要求赔偿？')">
+            <div class="sc-icon">🔒</div><div class="sc-title">商业秘密保护</div><div class="sc-desc">侵权认定与赔偿路径</div>
+          </div>
+          <div class="suggestion-card" onclick="quickAsk('股东知情权的范围包括哪些？公司拒绝提供怎么办？')">
+            <div class="sc-icon">👁</div><div class="sc-title">股东知情权</div><div class="sc-desc">权利范围与救济方式</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-bar">
+      <div class="input-wrap">
+        <textarea class="input-textarea" id="user-input"
+          placeholder="输入您的法律问题，Enter 发送，Shift+Enter 换行…"
+          rows="1" oninput="autoResize(this)"></textarea>
+          <div class="input-actions">
+            <button class="quick-btn" onclick="openTool('law')">📜 法条检索</button>
+            <button class="quick-btn" onclick="openTool('chat')">💬 法律对话</button>
+            <button class="quick-btn" onclick="openTool('contract')">📝 合同生成</button>
+            <button class="quick-btn" onclick="openTool('review')">🛡 合同审查</button>
+            <button class="quick-btn" onclick="openTool('court')">⚖️ 模拟法庭</button>
+            <div class="input-spacer"></div>
+            <button class="attach-btn" id="attachBtn" title="上传文件">📎</button>
+            <input type="file" id="fileInput" style="display: none;" accept=".pdf,.doc,.docx,.txt">
+            <button class="send-btn" id="send-btn" onclick="sendMessage()" title="发送 (Enter)">
+              <div class="spinner"></div>
+              <svg class="send-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M2 8l12-6-6 12V9L2 8z" fill="currentColor"/>
+              </svg>
+            </button>
+          </div>
+      </div>
+      <div class="input-hint">AI生成内容仅供参考，不构成正式法律意见</div>
+    </div>
+  </div>
+    <!-- ══ 合同生成视图（默认隐藏） ══ -->
+  <div class="chat-col" id="contractView" style="display: none;">
+    <div class="chat-header">
+      <div class="chat-title">📝 合同生成</div>
+      <div class="chat-subtitle">选择合同类型，填写关键信息</div>
+    </div>
+    <div class="contract-form-container">
+      <div class="contract-form">
+        <div class="form-group">
+          <label>合同类型 *</label>
+          <select id="contractTypeSelect" class="form-select">
+            <option value="">请选择合同类型</option>
+            <option value="房屋租赁合同">房屋租赁合同</option>
+            <option value="劳动合同">劳动合同</option>
+            <option value="借款合同">借款合同</option>
+            <option value="买卖合同">买卖合同</option>
+            <option value="技术服务合同">技术服务合同</option>
+          </select>
+        </div>
+        
+        <div id="contractDynamicFields" class="dynamic-fields">
+          <!-- 动态字段会显示在这里 -->
+        </div>
+        
+        <div class="form-group">
+          <label>其他要求（可选）</label>
+          <textarea id="contractExtraReq" class="form-textarea" rows="3" placeholder="例如：需要包含违约责任条款、争议解决方式等"></textarea>
+        </div>
+        
+        <div class="form-actions">
+          <button class="cancel-btn" id="backToChatBtn">返回</button>
+          <button class="submit-btn" id="generateContractBtn">生成合同 →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/config.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/tools.js"></script>
+<script src="/js/chat.js"></script>
+<script src="/js/main.js"></script>
+</body>
+</html>

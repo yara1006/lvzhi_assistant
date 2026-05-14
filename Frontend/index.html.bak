@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>律智助手 · 法内狂徒</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1a1a2e;
+  --ink-light: #4a4a6a;
+  --ink-muted: #9090b0;
+  --paper: #f7f6f2;
+  --paper-card: #ffffff;
+  --paper-warm: #f2f0ea;
+  --gold: #c9a84c;
+  --gold-light: #e8d5a3;
+  --gold-pale: #fdf8ed;
+  --gold-border: rgba(201,168,76,0.3);
+  --red-law: #8b2020;
+  --red-pale: #fdf0f0;
+  --teal: #1a6b6b;
+  --teal-pale: #eef6f6;
+  --purple: #4a3580;
+  --purple-pale: #f0edfb;
+  --border: rgba(26,26,46,0.08);
+  --border-med: rgba(26,26,46,0.14);
+  --shadow-sm: 0 1px 8px rgba(26,26,46,0.06);
+  --shadow-md: 0 4px 24px rgba(26,26,46,0.10);
+  --r: 10px;
+  --r-lg: 14px;
+  --sidebar-w: 260px;
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; font-family:'DM Sans',sans-serif; background:var(--paper); color:var(--ink); overflow:hidden; }
+
+/* ── APP SHELL ── */
+.app { display:grid; grid-template-columns:var(--sidebar-w) 1fr; height:100vh; overflow:hidden; }
+
+/* ── SIDEBAR ── */
+.sidebar { display:flex; flex-direction:column; height:100vh; background:var(--ink); overflow:hidden; }
+
+.sidebar-logo { flex-shrink:0; padding:18px 16px 14px; border-bottom:1px solid rgba(255,255,255,0.07); display:flex; align-items:center; gap:10px; }
+.logo-badge { width:32px; height:32px; background:var(--gold); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+.logo-name { font-family:'Noto Serif SC',serif; font-size:15px; font-weight:600; color:#fff; letter-spacing:0.03em; }
+.logo-tagline { font-size:10px; color:rgba(232,213,163,0.7); letter-spacing:0.06em; margin-top:1px; }
+
+.new-chat-btn { flex-shrink:0; margin:12px 12px 0; padding:9px 14px; background:rgba(201,168,76,0.12); border:1px solid var(--gold-border); border-radius:var(--r); color:var(--gold-light); font-size:13px; font-weight:500; font-family:'DM Sans',sans-serif; cursor:pointer; display:flex; align-items:center; gap:8px; transition:background 0.15s; width:calc(100% - 24px); }
+.new-chat-btn:hover { background:rgba(201,168,76,0.2); }
+.new-chat-btn .plus { font-size:18px; font-weight:300; line-height:1; color:var(--gold); }
+
+.sidebar-section-label { flex-shrink:0; padding:14px 16px 6px; font-size:10px; font-weight:500; color:rgba(144,144,176,0.7); letter-spacing:0.1em; text-transform:uppercase; }
+
+.tool-list { flex-shrink:0; padding:0 8px; display:flex; flex-direction:column; gap:2px; }
+.tool-btn { display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:8px; border:none; background:none; color:rgba(255,255,255,0.65); font-size:13px; font-family:'DM Sans',sans-serif; cursor:pointer; transition:all 0.15s; width:100%; text-align:left; }
+.tool-btn:hover { background:rgba(255,255,255,0.07); color:#fff; }
+.tool-icon { width:26px; height:26px; border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }
+.tool-law   .tool-icon { background:rgba(139,32,32,0.35); }
+.tool-case  .tool-icon { background:rgba(26,107,107,0.35); }
+.tool-contract .tool-icon { background:rgba(74,53,128,0.35); }
+.tool-review .tool-icon { background:rgba(180,120,10,0.35); }
+.tool-desc { font-size:11px; color:rgba(144,144,176,0.6); line-height:1; margin-top:1px; }
+
+/* ── HISTORY — takes all remaining height ── */
+.history-section { flex:1; min-height:0; display:flex; flex-direction:column; overflow:hidden; border-top:1px solid rgba(255,255,255,0.07); margin-top:10px; }
+.history-label { flex-shrink:0; padding:12px 16px 6px; font-size:10px; font-weight:500; color:rgba(144,144,176,0.7); letter-spacing:0.1em; text-transform:uppercase; }
+.history-scroll { flex:1; overflow-y:auto; padding:0 8px 12px; }
+.history-scroll::-webkit-scrollbar { width:3px; }
+.history-scroll::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.12); border-radius:2px; }
+
+.history-item { display:flex; align-items:center; padding:8px 10px; border-radius:8px; cursor:pointer; gap:8px; transition:background 0.12s; }
+.history-item:hover { background:rgba(255,255,255,0.07); }
+.history-item.active { background:rgba(201,168,76,0.12); }
+.hi-text { flex:1; font-size:12px; color:rgba(255,255,255,0.6); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.4; }
+.history-item.active .hi-text { color:var(--gold-light); }
+.hi-del { width:16px; height:16px; border-radius:4px; display:none; align-items:center; justify-content:center; font-size:11px; color:rgba(144,144,176,0.5); flex-shrink:0; cursor:pointer; }
+.history-item:hover .hi-del { display:flex; }
+.hi-del:hover { color:#e88; }
+.history-empty { padding:20px 16px; font-size:12px; color:rgba(144,144,176,0.5); line-height:1.6; text-align:center; }
+
+.sidebar-bottom { flex-shrink:0; padding:10px 12px; border-top:1px solid rgba(255,255,255,0.07); display:flex; align-items:center; gap:8px; }
+.status-dot { width:6px; height:6px; background:#4caf7d; border-radius:50%; animation:pulse 2.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+.status-text { font-size:11px; color:rgba(144,144,176,0.6); }
+
+/* ── CHAT COLUMN ── */
+.chat-col { display:flex; flex-direction:column; height:100vh; overflow:hidden; background:var(--paper); }
+
+.chat-header { flex-shrink:0; height:52px; border-bottom:1px solid var(--border); background:var(--paper-card); display:flex; align-items:center; padding:0 24px; gap:12px; }
+.chat-title { font-size:14px; font-weight:500; color:var(--ink); flex:1; }
+.chat-subtitle { font-size:12px; color:var(--ink-muted); }
+
+.messages { flex:1; overflow-y:auto; padding:28px 0; display:flex; flex-direction:column; gap:0; }
+.messages::-webkit-scrollbar { width:4px; }
+.messages::-webkit-scrollbar-thumb { background:var(--border-med); border-radius:2px; }
+
+/* ── WELCOME ── */
+.welcome { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 24px; gap:24px; text-align:center; }
+.welcome-icon { width:56px; height:56px; background:var(--ink); border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:26px; }
+.welcome-title { font-family:'Noto Serif SC',serif; font-size:22px; font-weight:600; color:var(--ink); line-height:1.4; }
+.welcome-sub { font-size:14px; color:var(--ink-muted); line-height:1.7; max-width:420px; margin-top:8px; }
+.suggestion-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; width:100%; max-width:560px; margin-top:8px; }
+.suggestion-card { background:var(--paper-card); border:1px solid var(--border); border-radius:var(--r-lg); padding:14px 16px; text-align:left; cursor:pointer; transition:all 0.15s; box-shadow:var(--shadow-sm); }
+.suggestion-card:hover { border-color:var(--gold); box-shadow:var(--shadow-md); transform:translateY(-1px); }
+.sc-icon { font-size:18px; margin-bottom:6px; }
+.sc-title { font-size:13px; font-weight:500; color:var(--ink); margin-bottom:3px; }
+.sc-desc { font-size:11px; color:var(--ink-muted); line-height:1.5; }
+
+/* ── MESSAGES ── */
+.msg-row { padding:8px 24px; display:flex; flex-direction:column; gap:4px; animation:msgIn 0.2s ease; }
+@keyframes msgIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
+.msg-row.user { align-items:flex-end; }
+.msg-row.assistant { align-items:flex-start; }
+.msg-meta { font-size:11px; color:var(--ink-muted); padding:0 4px; }
+.msg-bubble { max-width:70%; padding:12px 16px; border-radius:var(--r-lg); font-size:14px; line-height:1.75; word-break:break-word; white-space:pre-wrap; }
+.msg-row.user .msg-bubble { background:var(--ink); color:rgba(255,255,255,0.92); border-bottom-right-radius:4px; }
+.msg-row.assistant .msg-bubble { background:var(--paper-card); color:var(--ink); border:1px solid var(--border); border-bottom-left-radius:4px; box-shadow:var(--shadow-sm); }
+
+.tool-result-header { display:flex; align-items:center; gap:8px; margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid var(--border); }
+.tr-badge { font-size:11px; padding:2px 10px; border-radius:20px; font-weight:500; }
+.tr-law      { background:var(--red-pale);    color:var(--red-law); }
+.tr-case     { background:var(--teal-pale);   color:var(--teal); }
+.tr-contract { background:var(--purple-pale); color:var(--purple); }
+.tr-review   { background:#fff8ec; color:#7a5000; border:1px solid rgba(180,120,10,0.2); }
+
+/* ── FILE UPLOAD ── */
+.upload-zone {
+  border:2px dashed var(--border-med);
+  border-radius:var(--r);
+  padding:20px 16px;
+  text-align:center;
+  cursor:pointer;
+  transition:all 0.2s;
+  background:var(--paper);
+  position:relative;
+}
+.upload-zone:hover, .upload-zone.drag { border-color:var(--gold); background:var(--gold-pale); }
+.upload-zone input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+.upload-icon { font-size:24px; margin-bottom:6px; }
+.upload-text { font-size:13px; color:var(--ink-light); line-height:1.5; }
+.upload-hint { font-size:11px; color:var(--ink-muted); margin-top:3px; }
+.file-preview {
+  display:none;
+  align-items:center; gap:10px;
+  background:var(--paper-warm);
+  border:1px solid var(--border-med);
+  border-radius:var(--r);
+  padding:10px 14px;
+  margin-top:8px;
+}
+.file-preview.show { display:flex; }
+.file-icon { font-size:20px; flex-shrink:0; }
+.file-info { flex:1; min-width:0; }
+.file-name { font-size:13px; font-weight:500; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.file-size { font-size:11px; color:var(--ink-muted); margin-top:1px; }
+.file-remove { font-size:14px; color:var(--ink-muted); cursor:pointer; flex-shrink:0; padding:2px 4px; border-radius:4px; }
+.file-remove:hover { color:var(--red-law); background:var(--red-pale); }
+
+/* Risk level badges */
+.risk-section { margin-top:2px; }
+.risk-tag {
+  display:inline-block; font-size:11px; padding:1px 8px;
+  border-radius:12px; font-weight:500; margin-right:4px;
+}
+.risk-high   { background:#fff0f0; color:#c0392b; }
+.risk-med    { background:#fff8ec; color:#b06000; }
+.risk-low    { background:#f0f8f0; color:#2e7d32; }
+
+.cursor { display:inline-block; width:2px; height:1em; background:var(--gold); margin-left:2px; vertical-align:middle; animation:blink 0.8s step-start infinite; }
+@keyframes blink { 50%{opacity:0} }
+
+/* ── INPUT BAR ── */
+.input-bar { flex-shrink:0; padding:12px 24px 16px; background:var(--paper); border-top:1px solid var(--border); }
+.input-wrap { background:var(--paper-card); border:1px solid var(--border-med); border-radius:var(--r-lg); display:flex; flex-direction:column; transition:border-color 0.2s, box-shadow 0.2s; box-shadow:var(--shadow-sm); }
+.input-wrap:focus-within { border-color:var(--gold); box-shadow:0 0 0 3px rgba(201,168,76,0.1); }
+.input-textarea { width:100%; border:none; outline:none; background:transparent; padding:14px 16px 6px; font-size:14px; font-family:'DM Sans',sans-serif; color:var(--ink); resize:none; line-height:1.6; min-height:52px; max-height:160px; overflow-y:auto; }
+.input-textarea::placeholder { color:var(--ink-muted); }
+.input-actions { display:flex; align-items:center; padding:6px 10px 10px; gap:6px; }
+.quick-btn { padding:5px 12px; border:1px solid var(--border-med); border-radius:20px; font-size:12px; color:var(--ink-light); background:var(--paper); cursor:pointer; transition:all 0.15s; font-family:'DM Sans',sans-serif; white-space:nowrap; }
+.quick-btn:hover { border-color:var(--gold); color:#7a5e1a; background:var(--gold-pale); }
+.input-spacer { flex:1; }
+.send-btn { width:36px; height:36px; background:var(--ink); border:none; border-radius:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.15s; flex-shrink:0; color:var(--gold-light); }
+.send-btn:hover { background:#2d2d4e; }
+.send-btn:disabled { opacity:0.35; cursor:not-allowed; }
+.send-btn .spinner { width:14px; height:14px; border:2px solid rgba(232,213,163,0.3); border-top-color:var(--gold-light); border-radius:50%; animation:spin 0.6s linear infinite; display:none; }
+@keyframes spin { to{transform:rotate(360deg)} }
+.send-btn.loading .spinner { display:block; }
+.send-btn.loading .send-icon { display:none; }
+.input-hint { margin-top:6px; text-align:center; font-size:11px; color:var(--ink-muted); }
+
+/* ── MODALS ── */
+.modal-overlay { position:fixed; inset:0; background:rgba(26,26,46,0.45); display:none; align-items:center; justify-content:center; z-index:200; }
+.modal-overlay.open { display:flex; }
+.modal { background:var(--paper-card); border-radius:var(--r-lg); width:480px; max-width:calc(100vw - 48px); box-shadow:var(--shadow-md); overflow:hidden; animation:modalIn 0.2s ease; }
+@keyframes modalIn { from{opacity:0;transform:scale(.97)} to{opacity:1;transform:scale(1)} }
+.modal-head { padding:18px 20px 14px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; }
+.modal-head h3 { font-size:15px; font-weight:500; flex:1; }
+.modal-close { width:28px; height:28px; border:none; background:none; border-radius:8px; cursor:pointer; font-size:16px; color:var(--ink-muted); display:flex; align-items:center; justify-content:center; transition:background 0.12s; }
+.modal-close:hover { background:var(--paper-warm); }
+.modal-body { padding:18px 20px; display:flex; flex-direction:column; gap:14px; }
+.form-group { display:flex; flex-direction:column; gap:6px; }
+.form-label { font-size:12px; font-weight:500; color:var(--ink-light); }
+.form-input,.form-select,.form-textarea { padding:9px 12px; border:1px solid var(--border-med); border-radius:var(--r); font-size:13px; font-family:'DM Sans',sans-serif; color:var(--ink); background:var(--paper); outline:none; transition:border-color 0.2s; width:100%; }
+.form-input:focus,.form-select:focus,.form-textarea:focus { border-color:var(--gold); background:#fff; box-shadow:0 0 0 3px rgba(201,168,76,0.08); }
+.form-textarea { resize:none; min-height:72px; line-height:1.6; }
+.form-select { appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239090b0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; background-color:var(--paper); padding-right:32px; }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.tag-picker { display:flex; flex-wrap:wrap; gap:6px; }
+.tag-pick { padding:5px 12px; border:1px solid var(--border-med); border-radius:20px; font-size:12px; color:var(--ink-light); cursor:pointer; transition:all 0.12s; user-select:none; background:var(--paper); }
+.tag-pick:hover { border-color:var(--gold); }
+.tag-pick.on { background:var(--gold-pale); border-color:var(--gold); color:#7a5e1a; font-weight:500; }
+.modal-foot { padding:14px 20px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:8px; background:var(--paper-warm); }
+.modal-cancel { padding:8px 18px; border:1px solid var(--border-med); border-radius:var(--r); background:var(--paper-card); font-size:13px; color:var(--ink-light); cursor:pointer; font-family:'DM Sans',sans-serif; transition:background 0.12s; }
+.modal-cancel:hover { background:var(--paper-warm); }
+.modal-submit { padding:8px 22px; background:var(--ink); border:none; border-radius:var(--r); color:var(--gold-light); font-size:13px; font-weight:500; font-family:'DM Sans',sans-serif; cursor:pointer; transition:background 0.15s; }
+.modal-submit:hover { background:#2d2d4e; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-badge">⚖</div>
+      <div>
+        <div class="logo-name">律智助手</div>
+        <div class="logo-tagline">法内狂徒 · AI法律平台</div>
+      </div>
+    </div>
+
+    <button class="new-chat-btn" onclick="newChat()">
+      <span class="plus">+</span> 新建对话
+    </button>
+
+    <div class="sidebar-section-label">专业工具</div>
+    <div class="tool-list">
+      <button class="tool-btn tool-law" onclick="openTool('law')">
+        <div class="tool-icon">📜</div>
+        <div><div>法条检索</div><div class="tool-desc">精准查找相关法律条文</div></div>
+      </button>
+      <button class="tool-btn tool-case" onclick="openTool('case')">
+        <div class="tool-icon">🔍</div>
+        <div><div>案例检索</div><div class="tool-desc">检索相似司法裁判案例</div></div>
+      </button>
+      <button class="tool-btn tool-contract" onclick="openTool('contract')">
+        <div class="tool-icon">📝</div>
+        <div><div>合同生成</div><div class="tool-desc">AI起草专业合同文本</div></div>
+      </button>
+      <button class="tool-btn tool-review" onclick="openTool('review')">
+        <div class="tool-icon">🛡</div>
+        <div><div>合同审查</div><div class="tool-desc">识别条款风险与隐患</div></div>
+      </button>
+    </div>
+
+    <div class="history-section">
+      <div class="history-label">历史对话</div>
+      <div class="history-scroll" id="history-scroll">
+        <div class="history-empty">暂无历史对话<br>开始第一次咨询吧</div>
+      </div>
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="status-dot"></div>
+      <div class="status-text">元器 API 已连接（Demo模式）</div>
+    </div>
+  </aside>
+
+  <!-- ══ CHAT ══ -->
+  <div class="chat-col">
+    <div class="chat-header">
+      <div class="chat-title" id="chat-title">新建对话</div>
+      <div class="chat-subtitle">自由提问，或使用左侧专业工具</div>
+    </div>
+
+    <div class="messages" id="messages">
+      <div class="welcome" id="welcome">
+        <div class="welcome-icon">⚖️</div>
+        <div>
+          <div class="welcome-title">您好，我是您的法律AI助手</div>
+          <div class="welcome-sub">直接输入任何法律问题，或使用左侧专业工具进行精准的法条检索、案例查询和合同生成。</div>
+        </div>
+        <div class="suggestion-grid">
+          <div class="suggestion-card" onclick="quickAsk('劳动合同试用期最长多久？工资不得低于多少？')">
+            <div class="sc-icon">⏱</div><div class="sc-title">试用期规定</div><div class="sc-desc">时长与工资标准</div>
+          </div>
+          <div class="suggestion-card" onclick="quickAsk('合同无效的情形有哪些？法律后果是什么？')">
+            <div class="sc-icon">❌</div><div class="sc-title">合同无效情形</div><div class="sc-desc">认定条件与法律后果</div>
+          </div>
+          <div class="suggestion-card" onclick="quickAsk('员工离职泄露商业秘密，公司如何维权并要求赔偿？')">
+            <div class="sc-icon">🔒</div><div class="sc-title">商业秘密保护</div><div class="sc-desc">侵权认定与赔偿路径</div>
+          </div>
+          <div class="suggestion-card" onclick="quickAsk('股东知情权的范围包括哪些？公司拒绝提供怎么办？')">
+            <div class="sc-icon">👁</div><div class="sc-title">股东知情权</div><div class="sc-desc">权利范围与救济方式</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-bar">
+      <div class="input-wrap">
+        <textarea class="input-textarea" id="user-input"
+          placeholder="输入您的法律问题，Enter 发送，Shift+Enter 换行…"
+          rows="1" oninput="autoResize(this)"></textarea>
+        <div class="input-actions">
+          <button class="quick-btn" onclick="openTool('law')">📜 法条检索</button>
+          <button class="quick-btn" onclick="openTool('case')">🔍 案例检索</button>
+          <button class="quick-btn" onclick="openTool('contract')">📝 合同生成</button>
+          <button class="quick-btn" onclick="openTool('review')">🛡 合同审查</button>
+          <div class="input-spacer"></div>
+          <button class="send-btn" id="send-btn" onclick="sendMessage()" title="发送 (Enter)">
+            <div class="spinner"></div>
+            <svg class="send-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M2 8l12-6-6 12V9L2 8z" fill="currentColor"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="input-hint">AI生成内容仅供参考，不构成正式法律意见</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TOOL MODALS ══ -->
+<div class="modal-overlay" id="modal-law">
+  <div class="modal">
+    <div class="modal-head"><span>📜</span><h3>法条精准检索</h3><button class="modal-close" onclick="closeTool('law')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">法律问题描述 *</label>
+        <textarea class="form-textarea" id="law-query" placeholder="例如：劳动合同试用期最长多久？违反后果如何？"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">涉及法律领域（可多选）</label>
+        <div class="tag-picker" id="law-tags">
+          <span class="tag-pick on" onclick="togglePick(this)">劳动法</span>
+          <span class="tag-pick" onclick="togglePick(this)">合同法</span>
+          <span class="tag-pick" onclick="togglePick(this)">公司法</span>
+          <span class="tag-pick" onclick="togglePick(this)">民法典</span>
+          <span class="tag-pick" onclick="togglePick(this)">侵权责任</span>
+          <span class="tag-pick" onclick="togglePick(this)">刑法</span>
+          <span class="tag-pick" onclick="togglePick(this)">知识产权</span>
+          <span class="tag-pick" onclick="togglePick(this)">行政法</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="modal-cancel" onclick="closeTool('law')">取消</button>
+      <button class="modal-submit" onclick="submitTool('law')">开始检索 →</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-case">
+  <div class="modal">
+    <div class="modal-head"><span>🔍</span><h3>司法案例检索</h3><button class="modal-close" onclick="closeTool('case')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">案件情况描述 *</label>
+        <textarea class="form-textarea" id="case-query" placeholder="例如：员工离职入职竞争对手，带走了公司客户名单，我们如何维权？"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">案件类型</label>
+        <div class="tag-picker" id="case-tags">
+          <span class="tag-pick on" onclick="togglePick(this)">民事</span>
+          <span class="tag-pick" onclick="togglePick(this)">刑事</span>
+          <span class="tag-pick" onclick="togglePick(this)">行政</span>
+          <span class="tag-pick" onclick="togglePick(this)">商事</span>
+          <span class="tag-pick" onclick="togglePick(this)">劳动仲裁</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="modal-cancel" onclick="closeTool('case')">取消</button>
+      <button class="modal-submit" onclick="submitTool('case')">检索案例 →</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-contract">
+  <div class="modal">
+    <div class="modal-head"><span>📝</span><h3>智能合同生成</h3><button class="modal-close" onclick="closeTool('contract')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">合同类型 *</label>
+        <select class="form-select" id="contract-type">
+          <option>劳动合同</option>
+          <option>买卖合同</option>
+          <option>租赁合同</option>
+          <option selected>技术服务合同</option>
+          <option>保密协议 (NDA)</option>
+          <option>股权转让协议</option>
+          <option>委托代理合同</option>
+          <option>合伙协议</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">甲方名称</label><input class="form-input" id="party-a" placeholder="甲方（可选）"></div>
+        <div class="form-group"><label class="form-label">乙方名称</label><input class="form-input" id="party-b" placeholder="乙方（可选）"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">合同金额</label><input class="form-input" id="amount" placeholder="如：50万元"></div>
+        <div class="form-group"><label class="form-label">合同期限</label><input class="form-input" id="duration" placeholder="如：一年"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">特殊条款需求（可选）</label>
+        <textarea class="form-textarea" id="contract-extra" style="min-height:56px;" placeholder="如：需要竞业限制条款、知识产权归属约定…"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="modal-cancel" onclick="closeTool('contract')">取消</button>
+      <button class="modal-submit" onclick="submitTool('contract')">生成合同草稿 →</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-review">
+  <div class="modal">
+    <div class="modal-head"><span>🛡</span><h3>合同风险审查</h3><button class="modal-close" onclick="closeTool('review')">✕</button></div>
+    <div class="modal-body">
+      <!-- File upload -->
+      <div class="form-group">
+        <label class="form-label">上传合同文件（PDF / Word）</label>
+        <div class="upload-zone" id="upload-zone"
+          ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+          <input type="file" id="review-file" accept=".pdf,.doc,.docx" onchange="onFileSelect(event)">
+          <div class="upload-icon">📄</div>
+          <div class="upload-text">拖拽文件到此处，或<strong>点击选择文件</strong></div>
+          <div class="upload-hint">支持 PDF、Word（.doc/.docx），最大 20MB</div>
+        </div>
+        <div class="file-preview" id="file-preview">
+          <div class="file-icon" id="file-icon">📄</div>
+          <div class="file-info">
+            <div class="file-name" id="file-name">合同文件.pdf</div>
+            <div class="file-size" id="file-size">1.2 MB</div>
+          </div>
+          <div class="file-remove" onclick="removeFile()" title="移除">✕</div>
+        </div>
+      </div>
+
+      <!-- Or paste text -->
+      <div class="form-group">
+        <label class="form-label">或直接粘贴合同文本</label>
+        <textarea class="form-textarea" id="review-text" style="min-height:90px;"
+          placeholder="将合同内容粘贴到此处（若已上传文件则留空）…"></textarea>
+      </div>
+
+      <!-- Focus areas -->
+      <div class="form-group">
+        <label class="form-label">重点审查方向（可多选）</label>
+        <div class="tag-picker" id="review-tags">
+          <span class="tag-pick on" onclick="togglePick(this)">违约责任</span>
+          <span class="tag-pick on" onclick="togglePick(this)">付款条款</span>
+          <span class="tag-pick on" onclick="togglePick(this)">知识产权归属</span>
+          <span class="tag-pick" onclick="togglePick(this)">竞业限制</span>
+          <span class="tag-pick" onclick="togglePick(this)">保密条款</span>
+          <span class="tag-pick" onclick="togglePick(this)">争议解决</span>
+          <span class="tag-pick" onclick="togglePick(this)">合同解除条件</span>
+          <span class="tag-pick" onclick="togglePick(this)">免责条款</span>
+        </div>
+      </div>
+
+      <!-- Party role -->
+      <div class="form-group">
+        <label class="form-label">您在合同中的角色</label>
+        <select class="form-select" id="review-role">
+          <option value="甲方">甲方（委托/发包方）</option>
+          <option value="乙方">乙方（服务/承包方）</option>
+          <option value="不确定">不确定 / 综合审查</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="modal-cancel" onclick="closeTool('review')">取消</button>
+      <button class="modal-submit" onclick="submitTool('review')">开始审查 →</button>
+    </div>
+  </div>
+</div>
+<script>
+
+// 检查登录状态
+const token = localStorage.getItem('token');
+if (!token) {
+  window.location.href = '/login.html';
+}
+const CONFIG = window.YUANQI_CONFIG || { ASSISTANT_ID:'YOUR_ID', PROXY_URL:'http://localhost:3001/api/chat', DEMO_MODE:true };
+
+// ── STATE ──
+let isLoading = false;
+let chats = [];
+let activeChatId = null;
+
+function getChat() { return chats.find(c => c.id === activeChatId); }
+
+// ── CHAT MANAGEMENT ──
+function newChat() {
+  const id = Date.now();
+  chats.unshift({ id, title:'新对话', messages:[] });
+  activeChatId = id;
+  renderHistory();
+  renderMessages();
+  document.getElementById('chat-title').textContent = '新建对话';
+}
+
+function loadChat(id) {
+  activeChatId = id;
+  const c = getChat();
+  document.getElementById('chat-title').textContent = c?.title || '对话';
+  renderHistory();
+  renderMessages();
+}
+
+function deleteChat(id, e) {
+  e.stopPropagation();
+  chats = chats.filter(c => c.id !== id);
+  if (activeChatId === id) {
+    activeChatId = chats[0]?.id || null;
+    document.getElementById('chat-title').textContent = activeChatId ? (getChat()?.title || '对话') : '新建对话';
+    renderMessages();
+  }
+  renderHistory();
+}
+
+function renderHistory() {
+  const el = document.getElementById('history-scroll');
+  if (!chats.length) {
+    el.innerHTML = '<div class="history-empty">暂无历史对话<br>开始第一次咨询吧</div>';
+    return;
+  }
+  el.innerHTML = chats.map(c => `
+    <div class="history-item ${c.id===activeChatId?'active':''}" onclick="loadChat(${c.id})">
+      <div class="hi-text">${esc(c.title)}</div>
+      <div class="hi-del" onclick="deleteChat(${c.id},event)">✕</div>
+    </div>`).join('');
+}
+
+function renderMessages() {
+  const chat = getChat();
+  const el = document.getElementById('messages');
+  if (!chat || !chat.messages.length) {
+    el.innerHTML = `
+      <div class="welcome" id="welcome">
+        <div class="welcome-icon">⚖️</div>
+        <div><div class="welcome-title">您好，我是您的法律AI助手</div>
+        <div class="welcome-sub">直接输入任何法律问题，或使用左侧专业工具进行精准的法条检索、案例查询和合同生成。</div></div>
+        <div class="suggestion-grid">
+          <div class="suggestion-card" onclick="quickAsk('劳动合同试用期最长多久？工资不得低于多少？')"><div class="sc-icon">⏱</div><div class="sc-title">试用期规定</div><div class="sc-desc">时长与工资标准</div></div>
+          <div class="suggestion-card" onclick="quickAsk('合同无效的情形有哪些？法律后果是什么？')"><div class="sc-icon">❌</div><div class="sc-title">合同无效情形</div><div class="sc-desc">认定条件与法律后果</div></div>
+          <div class="suggestion-card" onclick="quickAsk('员工离职泄露商业秘密，公司如何维权并要求赔偿？')"><div class="sc-icon">🔒</div><div class="sc-title">商业秘密保护</div><div class="sc-desc">侵权认定与赔偿路径</div></div>
+          <div class="suggestion-card" onclick="quickAsk('股东知情权的范围包括哪些？公司拒绝提供怎么办？')"><div class="sc-icon">👁</div><div class="sc-title">股东知情权</div><div class="sc-desc">权利范围与救济方式</div></div>
+        </div>
+      </div>`;
+    return;
+  }
+  el.innerHTML = chat.messages.map(m => bubbleHTML(m)).join('');
+  scrollBot();
+}
+
+function bubbleHTML(m) {
+  const t = new Date(m.ts).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});
+  const who = m.role==='user'?'您':'律智助手';
+  let inner = '';
+  if (m.toolBadge) {
+    const cls={law:'tr-law',case:'tr-case',contract:'tr-contract',review:'tr-review'}[m.toolBadge]||'';
+    const lbl={law:'法条检索',case:'案例检索',contract:'合同草稿',review:'合同风险审查'}[m.toolBadge]||'';
+    inner = `<div class="tool-result-header"><span class="tr-badge ${cls}">${lbl}</span></div>${esc(m.content)}`;
+  } else { inner = esc(m.content); }
+  return `<div class="msg-row ${m.role}"><div class="msg-meta">${who} · ${t}</div><div class="msg-bubble">${inner}</div></div>`;
+}
+
+// ── SEND ──
+async function sendMessage(text, toolBadge) {
+  if (isLoading) return;
+  const inp = document.getElementById('user-input');
+  const msg = text !== undefined ? text : inp.value.trim();
+  if (!msg) return;
+  inp.value=''; autoResize(inp);
+  setLoading(true);
+
+  // ensure chat exists
+  if (!activeChatId) newChat();
+  const chat = getChat();
+
+  // add user bubble
+  const userMsg = {role:'user', content:msg, ts:Date.now()};
+  chat.messages.push(userMsg);
+  if (chat.title==='新对话' && chat.messages.length===1) {
+    chat.title = msg.slice(0,22)+(msg.length>22?'…':'');
+    document.getElementById('chat-title').textContent = chat.title;
+    renderHistory();
+  }
+  appendBubble(userMsg);
+
+  // create assistant bubble
+  const {target, cursor} = createStreamBubble(toolBadge||null);
+  let full = CONFIG.DEMO_MODE ? await demoStream(target, cursor, toolBadge||'chat') : await callAPI(msg, target, cursor);
+
+  cursor.remove();
+  chat.messages.push({role:'assistant', content:full, ts:Date.now(), toolBadge:toolBadge||null});
+  setLoading(false);
+}
+
+function quickAsk(t) { document.getElementById('user-input').value=t; sendMessage(); }
+
+function appendBubble(m) {
+  document.getElementById('welcome')?.remove();
+  const el = document.getElementById('messages');
+  const t = new Date(m.ts).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});
+  const div = document.createElement('div');
+  div.className = `msg-row ${m.role}`;
+  div.innerHTML = `<div class="msg-meta">${m.role==='user'?'您':'律智助手'} · ${t}</div><div class="msg-bubble">${esc(m.content)}</div>`;
+  el.appendChild(div);
+  scrollBot();
+}
+
+function createStreamBubble(toolBadge) {
+  document.getElementById('welcome')?.remove();
+  const el = document.getElementById('messages');
+  const t = new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});
+  const div = document.createElement('div');
+  div.className = 'msg-row assistant';
+  let hdr = '';
+  if (toolBadge) {
+    const cls={law:'tr-law',case:'tr-case',contract:'tr-contract',review:'tr-review'}[toolBadge]||'';
+    const lbl={law:'法条检索',case:'案例检索',contract:'合同草稿',review:'合同风险审查'}[toolBadge]||'';
+    hdr = `<div class="tool-result-header"><span class="tr-badge ${cls}">${lbl}</span></div>`;
+  }
+  div.innerHTML = `<div class="msg-meta">律智助手 · ${t}</div><div class="msg-bubble">${hdr}<span id="st"></span><span class="cursor"></span></div>`;
+  el.appendChild(div);
+  scrollBot();
+  return { target:div.querySelector('#st'), cursor:div.querySelector('.cursor') };
+}
+
+// ── TOOLS ──
+function openTool(t) { document.getElementById(`modal-${t}`).classList.add('open'); }
+function closeTool(t) { document.getElementById(`modal-${t}`).classList.remove('open'); }
+function togglePick(el) { el.classList.toggle('on'); }
+
+function submitTool(type) {
+  const prompt = buildPrompt(type);
+  if (!prompt) return;
+  closeTool(type);
+  sendMessage(prompt, type);
+}
+
+function buildPrompt(type) {
+  if (type==='law') {
+    const q = document.getElementById('law-query').value.trim();
+    if (!q) { alert('请输入法律问题'); return null; }
+    const tags = [...document.querySelectorAll('#law-tags .tag-pick.on')].map(t=>t.textContent).join('、');
+    return `【法条精准检索】\n问题：${q}\n涉及领域：${tags||'综合'}\n\n请列出最相关的法律条文（注明法律名称和条款编号），用通俗语言解释含义，并说明实务注意事项。`;
+  }
+  if (type==='case') {
+    const q = document.getElementById('case-query').value.trim();
+    if (!q) { alert('请描述案件情况'); return null; }
+    const tags = [...document.querySelectorAll('#case-tags .tag-pick.on')].map(t=>t.textContent).join('、');
+    return `【司法案例检索】\n案件：${q}\n类型：${tags||'民事'}\n\n请分析核心争议点，检索2-3个典型参考案例（注明案号），归纳裁判要旨，并给出处理建议。`;
+  }
+  if (type==='contract') {
+    const ct = document.getElementById('contract-type').value;
+    const a = document.getElementById('party-a').value||'甲方（待填写）';
+    const b = document.getElementById('party-b').value||'乙方（待填写）';
+    const amt = document.getElementById('amount').value||'待定';
+    const dur = document.getElementById('duration').value||'待定';
+    const extra = document.getElementById('contract-extra').value;
+    return `【合同生成】\n类型：${ct}\n甲方：${a}\n乙方：${b}\n金额：${amt}\n期限：${dur}\n特殊要求：${extra||'无'}\n\n请生成一份专业、合法合规的${ct}草稿，格式规范，包含所有必要条款，并附上签署栏。`;
+  }
+  if (type==='review') {
+    const text = document.getElementById('review-text').value.trim();
+    const fileName = document.getElementById('file-name').textContent;
+    const hasFile = document.getElementById('file-preview').classList.contains('show');
+    const tags = [...document.querySelectorAll('#review-tags .tag-pick.on')].map(t=>t.textContent).join('、');
+    const role = document.getElementById('review-role').value;
+
+    if (!text && !hasFile) { alert('请上传合同文件或粘贴合同文本'); return null; }
+
+    const source = hasFile ? `已上传文件：${fileName}` : `合同文本：\n${text}`;
+    return `【合同风险审查】\n${source}\n\n审查方身份：${role}\n重点审查方向：${tags||'全面审查'}\n\n请对该合同进行专业的法律风险分析，要求：\n1. 给出整体风险等级评估（高/中/低）\n2. 逐条列出发现的风险条款，每条说明：\n   - 所在位置/条款编号\n   - 风险类型与风险等级（高/中/低）\n   - 具体风险说明\n   - 修改建议\n3. 给出总结性修改意见\n请重点关注：${tags||'所有条款'}`;
+  }
+}
+
+document.querySelectorAll('.modal-overlay').forEach(el=>{
+  el.addEventListener('click', e=>{ if(e.target===el) el.classList.remove('open'); });
+});
+
+// ── API ──
+async function callAPI(prompt, target, cursor) {
+  let full='';
+  try {
+    const res = await fetch(CONFIG.PROXY_URL,{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({assistant_id:CONFIG.ASSISTANT_ID,message:prompt,stream:true})
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const reader=res.body.getReader(), dec=new TextDecoder();
+    let buf='';
+    while(true){
+      const {value,done}=await reader.read(); if(done)break;
+      buf+=dec.decode(value,{stream:true});
+      const lines=buf.split('\n'); buf=lines.pop();
+      for(const line of lines){
+        if(!line.startsWith('data: ')) continue;
+        const d=line.slice(6).trim(); if(d==='[DONE]') break;
+        try{ const j=JSON.parse(d); const delta=j.choices?.[0]?.delta?.content||'';
+          if(delta){target.textContent+=delta;full+=delta;scrollBot();}
+        }catch(_){}
+      }
+    }
+  } catch(err){
+    target.textContent=`请求失败：${err.message}\n请确认后端代理已启动（node server.js）`;
+    full=target.textContent;
+  }
+  return full;
+}
+
+// ── FILE UPLOAD ──
+let selectedFile = null;
+
+function onFileSelect(e) {
+  const file = e.target.files[0];
+  if (file) showFile(file);
+}
+function onDragOver(e) { e.preventDefault(); document.getElementById('upload-zone').classList.add('drag'); }
+function onDragLeave()  { document.getElementById('upload-zone').classList.remove('drag'); }
+function onDrop(e) {
+  e.preventDefault();
+  document.getElementById('upload-zone').classList.remove('drag');
+  const file = e.dataTransfer.files[0];
+  if (file) showFile(file);
+}
+function showFile(file) {
+  selectedFile = file;
+  const ext = file.name.split('.').pop().toLowerCase();
+  const icon = ext==='pdf' ? '📕' : '📘';
+  document.getElementById('file-icon').textContent = icon;
+  document.getElementById('file-name').textContent = file.name;
+  document.getElementById('file-size').textContent = (file.size/1024/1024).toFixed(2)+' MB';
+  document.getElementById('file-preview').classList.add('show');
+}
+function removeFile() {
+  selectedFile = null;
+  document.getElementById('file-preview').classList.remove('show');
+  document.getElementById('review-file').value = '';
+}
+
+// ── DEMO RESPONSES ──
+const DEMOS={
+  review:`合同风险审查报告
+════════════════════════════
+
+整体风险等级：【中等风险】
+发现风险条款 4 处（高风险 1 处 / 中风险 2 处 / 低风险 1 处）
+
+────────────────────────────
+风险一  【高风险】第五条 违约责任
+
+位置：第五条第2款
+风险类型：违约责任显失公平
+风险说明：合同约定乙方逾期交付每日罚款为合同总额的1%，而甲方逾期付款仅为万分之三，双方违约责任悬殊，对乙方明显不公平，可能被认定为"显失公平"条款，存在被撤销风险。
+修改建议：建议将双方违约金比例统一或调整对等，乙方逾期违约金上限不超过合同总额的10%，与甲方标准保持对称。
+
+────────────────────────────
+风险二  【中风险】第六条 知识产权
+
+位置：第六条第1款
+风险类型：知识产权归属不明确
+风险说明：条款约定"相关成果知识产权归甲方所有"，但未明确区分乙方已有的基础技术与本合同专项开发成果，可能导致乙方既有知识产权被一并转让的争议。
+修改建议：建议增加"乙方原有知识产权不受本合同影响，甲方仅获得专项开发成果的知识产权"的明确表述。
+
+────────────────────────────
+风险三  【中风险】第九条 争议解决
+
+位置：第九条
+风险类型：管辖约定不利
+风险说明：合同约定在甲方所在地法院起诉，对乙方存在地域不便，且缺少仲裁选项，可能增加乙方维权成本。
+修改建议：建议改为提交独立仲裁机构仲裁，或约定双方协商选择中间地点法院。
+
+────────────────────────────
+风险四  【低风险】第三条 付款条款
+
+位置：第三条第2款
+风险类型：付款节点表述模糊
+风险说明："验收完成后合理期限内付款"表述不够明确，"合理期限"无具体天数，可能引发付款时间争议。
+修改建议：建议改为"验收完成后7个工作日内付款"，时间节点清晰可执行。
+
+════════════════════════════
+总体修改建议
+
+本合同整体结构完整，主要风险集中在违约责任条款的公平性和知识产权归属表述上。建议优先修改第五条和第六条，明确双方权利义务对等原则，降低未来纠纷风险。
+
+如需针对某一条款进行深入分析或起草修改版本，请直接提问。`,
+  law:`根据《中华人民共和国劳动合同法》相关规定：
+
+【第十九条 — 试用期时长】
+• 合同期限不满三个月：不得约定试用期
+• 三个月以上不满一年：试用期 ≤ 1个月
+• 一年以上不满三年：试用期 ≤ 2个月
+• 三年以上或无固定期限：试用期 ≤ 6个月
+
+【第二十条 — 试用期工资】
+不得低于以下三者中最高值：
+1. 本单位相同岗位最低档工资
+2. 劳动合同约定工资的 80%
+3. 用人单位所在地最低工资标准
+
+【第八十三条 — 违法后果】
+违规的，劳动者可要求补足差额，并获得超出法定试用期部分的赔偿金。
+
+【实务提示】
+同一用人单位与同一劳动者只能约定一次试用期；以完成特定任务为期限的合同不得约定试用期。`,
+  case:`检索到相关典型案例 3 件：
+
+─────────────────────────────
+案例一  (2021)京03民终5891号
+某科技公司诉王某竞业限制纠纷
+
+裁判要旨：用人单位未按月支付竞业限制补偿金超三个月的，劳动者有权解除竞业限制协议。法院驳回原告全部诉请。
+
+─────────────────────────────
+案例二  (2020)沪01民终11234号
+商业秘密侵权纠纷
+
+裁判要旨：离职员工带走客户名单、技术资料，认定侵犯商业秘密，判令赔偿 82 万元。
+
+─────────────────────────────
+案例三  (2022)粤01民终7823号
+保密协议效力纠纷
+
+法院观点：保密条款约定过宽泛的，效力存疑。建议企业对商业秘密范围作列举式规定。
+
+─────────────────────────────
+综合建议：竞业限制须配套补偿金；商业秘密范围须在合同中明确界定；离职时做好书面告知记录。`,
+  contract:`技 术 服 务 合 同（AI草稿）
+═══════════════════════════════
+
+甲方（委托方）：_______________
+乙方（服务方）：_______________
+
+第一条 服务内容
+乙方为甲方提供约定的技术服务，具体内容以双方确认的需求文档为准。
+
+第二条 服务期限
+自____年__月__日起至____年__月__日。
+
+第三条 服务费用
+合同总额人民币______元整，分两期支付：签订后7日内50%，验收后7日内50%。
+
+第四条 双方义务
+甲方：按时付款；提供必要资料；配合验收。
+乙方：按约完成服务；保守商业秘密；成果知识产权归甲方。
+
+第五条 违约责任
+逾期付款按日万分之三计违约金；逾期交付每日扣合同额千分之二，累计不超过10%。
+
+第六条 争议解决
+协商不成，提交______仲裁委员会仲裁。
+
+甲方（盖章）：________  乙方（盖章）：________
+日期：___年__月__日     日期：___年__月__日
+
+═══════════════════════════════
+⚠️ AI生成草稿，签署前请律师审核`,
+  chat:`根据您的问题，为您解答如下：
+
+劳动合同试用期受《劳动合同法》严格规范，核心规定如下：
+
+【时长上限】
+合同期限决定试用期上限：3个月以内不得约定；3个月至1年最长1个月；1至3年最长2个月；3年以上或无固定期限最长6个月。
+
+【工资下限】
+试用期工资不得低于约定工资的80%，且不得低于当地最低工资标准，两者取高值。
+
+【违规代价】
+若违反上述规定，劳动者有权要求补足工资差额，并可主张赔偿金。
+
+如需了解具体场景的应对方案，欢迎继续提问，或使用左侧"专业工具"获取更精准的条文检索和案例参考。`
+};
+
+async function demoStream(target, cursor, type) {
+  const text = DEMOS[type]||DEMOS.chat;
+  let full='';
+  for(let i=0;i<text.length;i++){
+    target.textContent+=text[i]; full+=text[i];
+    await new Promise(r=>setTimeout(r, i<5?30:Math.random()*10+3));
+    if(i%12===0) scrollBot();
+  }
+  return full;
+}
+
+// ── UTILS ──
+function setLoading(on){ isLoading=on; const b=document.getElementById('send-btn'); b.disabled=on; b.classList.toggle('loading',on); }
+function scrollBot(){ const m=document.getElementById('messages'); m.scrollTop=m.scrollHeight; }
+function autoResize(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,160)+'px'; }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+document.getElementById('user-input').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}
+});
+
+// Init with a blank chat
+newChat();
+</script>
+</body>
+</html>
